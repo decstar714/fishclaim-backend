@@ -1,4 +1,5 @@
 from datetime import datetime
+import enum
 from sqlalchemy import (
     Column,
     Integer,
@@ -14,6 +15,13 @@ from sqlalchemy.orm import relationship
 from .database import Base
 
 
+class UserRole(str, enum.Enum):
+    ADMIN = "admin"
+    REVIEWER = "reviewer"
+    USER = "user"
+    VIEWER = "viewer"
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -22,10 +30,19 @@ class User(Base):
     username = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)
     display_name = Column(String)
+    role = Column(
+        String,
+        nullable=False,
+        default=UserRole.USER.value,
+        server_default=UserRole.USER.value,
+    )
     created_at = Column(DateTime, default=datetime.utcnow)
 
     catches = relationship("Catch", back_populates="user")
     claims = relationship("Claim", back_populates="user")
+    refresh_tokens = relationship(
+        "RefreshToken", back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class Water(Base):
@@ -124,3 +141,16 @@ class Claim(Base):
         ),
     )
 
+
+class RefreshToken(Base):
+    __tablename__ = "refresh_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    token_hash = Column(String, nullable=False, unique=True)
+    revoked = Column(Boolean, default=False)
+    replaced_by_token_hash = Column(String, nullable=True)
+    expires_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="refresh_tokens")

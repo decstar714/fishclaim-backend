@@ -32,6 +32,14 @@ Docker build uses `Dockerfile` with `requirements.txt` and the `app/` directory.
 - `dev`: integration
 - `feature/*`: feature branches
 
+## Working on backend + frontend together
+- Start from `dev` in both repos; create the same feature branch name (e.g. `feature/auth-session-hardening`).
+- Develop locally: run the FastAPI server; in the UI repo set `VITE_API_BASE_URL` to your local API (e.g. `http://localhost:8080/api`).
+- Keep commits small and focused. Separate backend and frontend commits are fine as long as the branch names match.
+- Run checks before push (`pytest` here; `npm run lint`/`npm test` in the UI if available).
+- Push both branches to origin when the end-to-end slice works; open PRs targeting `dev`.
+- Promote `dev` → `main` via PRs only; avoid direct pushes to `main`.
+
 ## Notes
 - Secrets should never be committed. Keep real values in `.env` (gitignored) using `.env.example` as a template.
 - If you add new config keys, update `.env.example` and this README.

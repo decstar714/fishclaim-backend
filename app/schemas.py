@@ -77,6 +77,7 @@ class UserBase(BaseModel):
 
 class User(UserBase):
     id: int
+    role: str = "user"
 
     class Config:
         from_attributes = True
@@ -94,6 +95,15 @@ class Token(BaseModel):
     token_type: str = "bearer"
 
 
+class TokenPair(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
+
+
 class TokenData(BaseModel):
     user_id: int | None = None
-

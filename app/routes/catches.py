@@ -4,17 +4,22 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
 from .claims import evaluate_claim_for_catch
-from ..deps import get_current_user
+from ..deps import get_current_user, require_roles
 
 
 router = APIRouter(prefix="/catches", tags=["catches"])
+_can_log_catch = require_roles(
+    models.UserRole.USER.value,
+    models.UserRole.ADMIN.value,
+    models.UserRole.REVIEWER.value,
+)
 
 
 @router.post("/", response_model=schemas.Catch)
 def create_catch(
     catch_in: schemas.CatchCreate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user),
+    current_user: models.User = Depends(_can_log_catch),
 ):
     # TEMP: until auth is in place, hardcode user_id 1
     user =  current_user
@@ -45,4 +50,3 @@ def create_catch(
 
     evaluate_claim_for_catch(db, catch)
     return catch
-

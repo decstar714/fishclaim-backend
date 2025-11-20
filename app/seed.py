@@ -1,3 +1,4 @@
+from app.auth import get_password_hash
 from app.database import SessionLocal, Base, engine
 from app import models
 
@@ -18,8 +19,9 @@ def main():
     user = models.User(
         email="test@example.com",
         username="conor",
-        password_hash="dev-only-placeholder",
+        password_hash=get_password_hash("password123"),
         display_name="Conor Dev",
+        role=models.UserRole.ADMIN.value,
     )
     db.add(user)
     db.flush()  # get user.id
@@ -73,4 +75,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
