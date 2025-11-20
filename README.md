@@ -17,12 +17,16 @@ FastAPI backend for FishClaim. Provides auth, waters/zones, catches, and claim r
 
 ## Running with Docker
 From the backend repo root (`/home/conor/fishclaim/backend`):
-1. `cp .env.example .env` and update values (use `fishclaim_db` as the host if you are attaching to the existing Postgres/PostGIS container).
+1. `cp .env.example .env` and update values (use `fishclaim_db` as the host if you are attaching to the existing Postgres/PostGIS container). `SECRET_KEY` must be set to a non-default value for any deployed environment.
 2. Ensure the Docker network `fishclaim_default` exists (created by the current stack). If missing, create it: `docker network create fishclaim_default`.
 3. Build and start the backend: `docker compose up -d --build backend`
 4. API will be on port `8080` by default (override with `BACKEND_PORT` in `.env`).
 
 Docker build uses `Dockerfile` with `requirements.txt` and the `app/` directory.
+
+### Configuration
+- `DATABASE_URL`, `SECRET_KEY`, `ALGORITHM`, and `ACCESS_TOKEN_EXPIRE_MINUTES` are read from environment variables (or `.env`).
+- `CORS_ORIGINS` can be provided as a comma-separated list to control allowed front-end origins (defaults to localhost dev ports).
 
 ## Deploy script (server)
 - `./deploy.sh [branch]` (default branch is `main`) will `git pull`, build the backend image, and restart the backend container without touching the database container.
