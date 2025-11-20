@@ -1,0 +1,25 @@
+name: fishclaim
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fishclaim_backend
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      SECRET_KEY: ${SECRET_KEY}
+      ALGORITHM: ${ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}
+    ports:
+      - "${BACKEND_PORT:-8080}:8000"
+    restart: unless-stopped
+    networks:
+      - fishclaim
+
+networks:
+  fishclaim:
+    external: true
+    name: fishclaim_default
