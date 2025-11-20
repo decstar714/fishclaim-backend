@@ -64,10 +64,20 @@ class Claim(BaseModel):
     zone_id: int
     species_id: int
     length_cm: float
+    status: str
+    is_active: bool
+    review_notes: str | None = None
+    reviewed_by_user_id: int | None = None
+    reviewed_at: datetime | None = None
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+
+class ClaimStatusUpdate(BaseModel):
+    status: str
+    review_notes: str | None = None
 
 class UserBase(BaseModel):
     email: str

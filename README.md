@@ -32,6 +32,10 @@ Docker build uses `Dockerfile` with `requirements.txt` and the `app/` directory.
 - `dev`: integration
 - `feature/*`: feature branches
 
+## Migrations
+- SQL migrations live in `app/migrations/`. Apply them manually to your database (e.g. `psql -f app/migrations/001_add_role_refresh_tokens_and_claim_status.sql`).
+- If you add new schema changes, create a new numbered file in that folder and document how to apply it.
+
 ## Working on backend + frontend together
 - Start from `dev` in both repos; create the same feature branch name (e.g. `feature/auth-session-hardening`).
 - Develop locally: run the FastAPI server; in the UI repo set `VITE_API_BASE_URL` to your local API (e.g. `http://localhost:8080/api`).

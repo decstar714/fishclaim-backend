@@ -9,6 +9,7 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     UniqueConstraint,
+    Text,
 )
 from sqlalchemy.orm import relationship
 
@@ -112,6 +113,14 @@ class Catch(Base):
     claim = relationship("Claim", back_populates="catch", uselist=False)
 
 
+class ClaimStatus(str, enum.Enum):
+    DRAFT = "draft"
+    SUBMITTED = "submitted"
+    UNDER_REVIEW = "under_review"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+
 class Claim(Base):
     __tablename__ = "claims"
 
@@ -124,6 +133,15 @@ class Claim(Base):
 
     length_cm = Column(Float, nullable=False)
     is_active = Column(Boolean, default=True)
+    status = Column(
+        String,
+        nullable=False,
+        default=ClaimStatus.APPROVED.value,
+        server_default=ClaimStatus.APPROVED.value,
+    )
+    review_notes = Column(Text)
+    reviewed_by_user_id = Column(Integer, ForeignKey("users.id"))
+    reviewed_at = Column(DateTime)
 
     created_at = Column(DateTime, default=datetime.utcnow)
     revoked_at = Column(DateTime)
@@ -133,6 +151,7 @@ class Claim(Base):
     species = relationship("Species", back_populates="claims")
     catch = relationship("Catch", back_populates="claim")
     water = relationship("Water")
+    reviewed_by = relationship("User", foreign_keys=[reviewed_by_user_id])
 
     __table_args__ = (
         UniqueConstraint(
