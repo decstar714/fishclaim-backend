@@ -5,15 +5,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
+from ..auth import create_access_token, get_password_hash, verify_password
+from ..config import get_settings
 from ..database import get_db
-from ..auth import (
-    get_password_hash,
-    verify_password,
-    create_access_token,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+settings = get_settings()
 
 
 @router.post("/register", response_model=schemas.User)
@@ -57,9 +54,8 @@ def login(
             detail="Incorrect username or password",
         )
 
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     token = create_access_token(
         data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
     return schemas.Token(access_token=token)
-

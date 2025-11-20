@@ -3,9 +3,11 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
+from .config import get_settings
 from .database import get_db
-from . import models, schemas
-from .auth import SECRET_KEY, ALGORITHM
+from . import models
+
+settings = get_settings()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
@@ -19,7 +21,7 @@ def get_current_user(
         detail="Could not validate credentials",
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
         sub = payload.get("sub")
         if sub is None:
             raise credentials_exception
@@ -31,4 +33,3 @@ def get_current_user(
     if user is None:
         raise credentials_exception
     return user
-
