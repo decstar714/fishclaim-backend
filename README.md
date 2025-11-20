@@ -24,6 +24,25 @@ From the backend repo root (`/home/conor/fishclaim/backend`):
 
 Docker build uses `Dockerfile` with `requirements.txt` and the `app/` directory.
 
+## Connecting to the FishClaim frontend
+To run the full stack locally with the `fishclaim` frontend repository:
+
+1. Clone both repos side by side, e.g.:
+   ```bash
+   git clone <frontend_repo_url> ../fishclaim
+   ```
+2. Copy `.env.example` to `.env` in this backend repo and set values (ensure `CORS_ORIGINS` includes the frontend dev host, e.g. `http://localhost:5173`).
+3. Start the backend (Docker or local Python). With Docker:
+   ```bash
+   docker network create fishclaim_default  # only if the network does not already exist
+   docker compose up -d --build backend
+   ```
+   The API will be reachable at `http://localhost:8080/api` by default.
+4. In the frontend repo, configure its API base URL to point to the backend (for Vite apps this is typically an env var like `VITE_API_BASE=http://localhost:8080/api`).
+5. Run the frontend dev server (commonly `npm install && npm run dev -- --host --port 5173`).
+
+With this setup the default CORS values allow the frontend dev server to call the backend without additional changes.
+
 ### Configuration
 - `DATABASE_URL`, `SECRET_KEY`, `ALGORITHM`, and `ACCESS_TOKEN_EXPIRE_MINUTES` are read from environment variables (or `.env`).
 - `CORS_ORIGINS` can be provided as a comma-separated list to control allowed front-end origins (defaults to localhost dev ports).
